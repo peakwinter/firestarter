@@ -21,3 +21,7 @@ This project depends on `django-captcha`, `django-gravatar`, `django-widget-twea
 To use, clone the distro, open `settings.py` and customize the values that you see. Sync the db, then migrate with `manage.py migrate` (used for Captcha). Then you're ready to go!
 
 Pull requests and suggestions welcome!
+
+
+### Sample Screenshot
+![][http://i.imgur.com/QbXAKp2.png]
