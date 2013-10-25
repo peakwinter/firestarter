@@ -24,4 +24,4 @@ Pull requests and suggestions welcome!
 
 
 ### Sample Screenshot
-![][http://i.imgur.com/QbXAKp2.png]
+![](http://i.imgur.com/QbXAKp2.png)
