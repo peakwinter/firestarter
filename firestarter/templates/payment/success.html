@@ -1,0 +1,21 @@
+{% extends 'form-base.html' %}
+{% block body %}
+{% load staticfiles %}
+<div class="text-center">
+  <h1><i class="icon-thumbs-up icon-4x text-success"></i></h1>
+  <h1>Thank you for your contribution!</h1>
+
+  <p>Your donation will go a long way to helping us meet our goal and keeping this project in production.</p>
+
+  <p>{{ success_disclaimer }}</p>
+
+  {% if btc %}
+  <p>Your Bitcoin payment will be verified with the address you provided before your order will be sent to you, if you requested a reward. If we have any questions, we will contact you by the email address provided.</p>
+  {% endif %}
+
+  <p>A receipt will be emailed to you to confirm this transaction.</p>
+</div>
+
+  <br />
+  <a class="pull-right btn btn-lg btn-default" href="/" id="backbutton">Done</a>
+{% endblock %}

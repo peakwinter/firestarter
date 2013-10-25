@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block body %}
+{% load gravatar %}
+{% load markup %}
+{% load widget_tweaks %}
+<h3>{{ qnum }} Question{% if qnum > 1 or qnum == 0 %}s{% endif %}</h3>
+{% for q in questions %}
+<div class="fs-question">
+	<div class="fs-question-byline media">
+		<a class="pull-left">
+			<img class="media-object" src="{% gravatar_url q.email 24 %}" />
+		</a>
+		<div class="media-body">
+			<p class="text-muted pull-right">Posted {{ q.created_at }}</p>
+			<p class="media-heading"><strong>{{ q.name }}</strong> says...</p>
+		</div>
+	</div>
+	<p>{{ q.text|markdown:"safe" }}</p>
+</div>
+	{% for qr in q.replies.all %}
+	<div class="fs-question fs-question-resp">
+		<div class="fs-question-byline media">
+			<a class="pull-left">
+				<img class="media-object" src="{% gravatar_url qr.email 24 %}" />
+			</a>
+			<div class="media-body">
+				<p class="text-muted pull-right">Posted {{ qr.created_at }}</p>
+				<p class="media-heading"><strong>{{ qr.name }}</strong> {% if qr.team_response %}<span class="label label-success">Project Member</span>{% endif %} replied...</p>
+			</div>
+		</div>
+		<p>{{ qr.text|markdown:"safe" }}</p>
+	</div>
+	{% endfor %}
+{% endfor %}
+<h3>Post a Question</h3>
+{% if messages %}
+	{% for message in messages %}
+		<div class="alert alert-danger">
+			{{ message }}
+		</div>
+	{% endfor %}
+{% endif %}
+<form class="form-horizontal" method="POST">
+	{% csrf_token %}
+	<div class="form-group">
+		<label for="que-name" class="col-lg-2 control-label">Name/Pseudo</label>
+		<div class="col-lg-10">
+			{% render_field form.name class+="form-control" %}
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="que-email" class="col-lg-2 control-label">Email</label>
+		<div class="col-lg-10">
+			{% render_field form.email class+="form-control" %}
+			<p class="help-block">Optional</p>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="que-text" class="col-lg-2 control-label">Question</label>
+		<div class="col-lg-10">
+			{% render_field form.text class+="form-control" rows="4" %}
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="que-text" class="col-lg-2 control-label">Captcha</label>
+		<div class="col-lg-10">
+			{% render_field form.captcha %}
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-lg-10 col-lg-offset-2">
+			<div class="checkbox">
+				<label>
+				{% render_field form.notify class+="checkbox" %} Notify me if a project member replies (requires email)
+				</label>
+			</div>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-lg-10 col-lg-offset-2">
+			<button type="submit" class="btn btn-primary"><i class="icon-question-sign"></i> Ask</button>
+		</div>
+	</div>
+</form>
+{% endblock %}

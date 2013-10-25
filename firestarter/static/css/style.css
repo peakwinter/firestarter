@@ -1,0 +1,84 @@
+body {
+	padding-top: 20px;
+}
+
+.fs-head {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.fs-update, .reward {
+	margin-bottom: 40px;
+}
+
+.fs-question {
+	margin-top: 35px;
+	margin-bottom: 30px;
+}
+
+.fs-question-resp {
+	margin-top: 0px;
+	margin-left: 40px;
+}
+
+.slimtop {
+	margin-top: 0px;
+}
+
+
+.fs-fundpage {
+	background-color: #DDDDDD;
+}
+
+.fs-fundpage-container {
+	background-color: #FFFFFF;
+	margin-top: 25px;
+	margin-bottom: 25px;
+	padding: 25px;
+	border-radius: 10px;
+}
+
+.fs-update-byline.media {
+	margin-top: 20px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #DDDDDD;
+}
+
+.fs-question-byline.media {
+	margin-top: 15px;
+	padding-bottom: 5px;
+	border-bottom: 1px solid #DDDDDD;
+}
+
+#validate {
+	display: none;
+	margin-top: 25px;
+}
+
+.exp {
+	margin-top: 25px;
+	margin-right: 20px;
+}
+
+.phead {
+	margin-top: 40px;
+}
+
+.ctypes {
+	padding: 10px;
+	border-radius: 6px;
+}
+
+.ctypes:hover {
+	background-color: #EEEEEE;
+}
+
+#donate-grp {
+	max-width: 200px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#sh-form, .rewardamt{
+	display: none;
+}

@@ -1,0 +1,75 @@
+{% extends 'form-base.html' %}
+{% block body %}
+{% load staticfiles %}
+{% load currency %}
+  <img src="{% static 'img/logo.png' %}" width="200" height="auto" /><br />
+
+  {% if request.session.fd.ptype == 'BC' %}
+  <br />
+  <div class="alert alert-success">
+    Use your Bitcoin client of choice to transfer <strong><i class="icon-btc"></i> {{ request.session.fd.amount }}</strong> to the donation address listed below. Once the transfer is successful, click the Next button at the bottom of this page.
+  </div>
+  <div class="input-group input-group-lg">
+    <span class="input-group-addon"><i class="icon-btc"></i></span>
+    <input type="text" class="form-control input-lg" value="{{ btc_donate_to }}" />
+  </div>
+  {% elif request.session.fd.ptype == 'CC' %}
+  <br />
+  <div class="alert alert-warning">
+    <strong>You have five minutes to complete your order.</strong>
+  </div>
+  {% elif request.session.fd.ptype == 'PP' %}
+  <br />
+  <div class="alert alert-warning">
+    <strong>You have fifteen minutes to approve this order.</strong>
+  </div>
+  {% endif %}
+
+  <h4 class="phead">Confirm your order</h4>
+
+  <table class="table">
+    <tbody>
+      {% if request.session.fd.ptype == 'BC' %}
+      <tr><td>Amount</td><td><i class="icon-btc"></i> {{ request.session.fd.amount }}</td></tr>
+      <tr><td>Bitcoin Address</td><td>{{ request.session.fd.ref }}</td></tr>
+        {% if request.session.fd.reward %}
+        <tr><td>Reward Level</td><td>{{ request.session.fd.reward_name }} - {{ request.session.fd.reward_short_desc }}</td></tr>
+        <tr><td>Shipping Name</td><td>{{ request.session.fd.sh_name }}</td></tr>
+        <tr><td>Address 1</td><td>{{ request.session.fd.sh_addr1 }}</td></tr>
+        <tr><td>Address 2</td><td>{{ request.session.fd.sh_addr2 }}</td></tr>
+        <tr><td>City</td><td>{{ request.session.fd.sh_city }}</td></tr>
+        <tr><td>State/Province</td><td>{{ request.session.fd.sh_state }}</td></tr>
+        <tr><td>Postal Code</td><td>{{ request.session.fd.sh_post }}</td></tr>
+        <tr><td>Country</td><td>{{ request.session.fd.sh_country }}</td></tr>
+        {% endif %}
+      {% elif request.session.fd.ptype == 'PP' %}
+      <tr><td>Amount</td><td>${{ request.session.fd.amount }} {% if request.session.fd.ctype == 'eur' %}(€{{ request.session.fd.amount_eur }}){% elif request.session.fd.ctype == 'gbp' %}(₤{{ request.session.fd.amount_gbp }}){% endif %}</td></tr>
+        {% if request.session.fd.reward %}
+        <tr><td>Reward Level</td><td>{{ request.session.fd.reward_name }} - {{ request.session.fd.reward_short_desc }}</td></tr>
+        {% endif %}
+      <tr><td>Shipping Address</td><td>Chosen in your PayPal account</td></tr>
+      {% else %}
+      <tr><td>Amount</td><td>${{ request.session.fd.amount }} {% if request.session.fd.ctype == 'eur' %}(€{{ request.session.fd.amount_eur }}){% elif request.session.fd.ctype == 'gbp' %}(₤{{ request.session.fd.amount_gbp }}){% endif %}</td></tr>
+      <tr><td>Cardholder Name</td><td>{{ request.session.fd.cc_name }}</td></tr>
+      <tr><td>Card</td><td>{{ request.session.fd.cc_type }} x-{{ request.session.fd.cc_last4 }}</td></tr>
+        {% if request.session.fd.reward %}
+        <tr><td>Reward Level</td><td>{{ request.session.fd.reward_name }} - {{ request.session.fd.reward_short_desc }}</td></tr>
+        <tr><td>Shipping Name</td><td>{{ request.session.fd.sh_name }}</td></tr>
+        <tr><td>Address 1</td><td>{{ request.session.fd.sh_addr1 }}</td></tr>
+        <tr><td>Address 2</td><td>{{ request.session.fd.sh_addr2 }}</td></tr>
+        <tr><td>City</td><td>{{ request.session.fd.sh_city }}</td></tr>
+        <tr><td>State/Province</td><td>{{ request.session.fd.sh_state }}</td></tr>
+        <tr><td>Postal Code</td><td>{{ request.session.fd.sh_post }}</td></tr>
+        <tr><td>Country</td><td>{{ request.session.fd.sh_country }}</td></tr>
+        {% endif %}
+      {% endif %}
+    </tbody>
+  </table>
+
+  {% if request.session.fd.ptype == 'PP' %}
+  <a class="btn btn-lg btn-default" id="backbutton"><i class="icon-arrow-left" href="/"></i> Cancel</a>
+  {% else %}
+  <a class="btn btn-lg btn-default" onclick="history.go(-1);" id="backbutton"><i class="icon-arrow-left"></i> Back</a>
+  {% endif %}
+  <a class="pull-right btn btn-lg btn-primary" href="{% if request.session.fd.ptype == 'PP' %}/c/PP/complete{% elif request.session.fd.ptype == 'BC' %}/c/BC/complete{% else %}/c/CC/complete{% endif %}" id="submitbutton"><i class="icon-ok"></i> Order</a>
+{% endblock %}

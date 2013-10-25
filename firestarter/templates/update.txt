@@ -1,0 +1,12 @@
+An update has been posted to {{ proj_name }}:
+
+
+{{ update.subject }}
+By {{ update.author }} - {{ update.created_at }}
+
+
+{{ update.text }}
+
+--
+
+For information about the project or the rewards offered, please visit {{ proj_addr }}.

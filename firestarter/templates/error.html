@@ -1,0 +1,11 @@
+{% extends 'form-base.html' %}
+{% block body %}
+{% load staticfiles %}
+  <div class="alert alert-danger">
+    <strong>Your request could not be completed:</strong>
+    <p>{{ msg }}</p>
+  </div>
+
+    <a class="btn btn-lg btn-default" href="/" id="backbutton">Home</a>
+    <a class="pull-right btn btn-lg btn-primary" href="/c/choose" id="submitbutton">Contribute</a>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'form-base.html' %}
+{% block body %}
+{% load staticfiles %}
+{% load currency %}
+  <form id="payform" role="form" method="POST" action="/c/BC" novalidate>
+    <img src="{% static 'img/logo.png' %}" width="200" height="auto" /><br />
+    <div class="alert alert-danger" id="validate">
+      There was an error in processing this information. Please verify that the fields in red below are correct.
+    </div>
+
+    <h4 class="phead">Step 1 - Set your donation amount: </h4>
+    <div id="donate-grp" class="form-group input-group input-group-lg">
+      <span class="input-group-addon"><i class="icon-btc"></i></span>
+      <input type="text" class="form-control" name="amount" id="amount" placeholder="BTC" />
+    </div>
+
+    <h4 class="phead">Step 2 - Choose your reward level:</h4>
+    <p>For more information about rewards, <a href="/">go back</a></p>
+    <div id="rewards-grp" class="form-group">
+      <table class="table table-hover">
+        <tbody id="rewardslist">
+          <tr><td><input type="radio" name="reward" id="rsel-btc0" value="none"></td><td class="price"><strong><i class="icon-btc"></i> 0</strong></td><td>None</td><td>Don't send me a reward</td></tr>
+          {% for reward in rewards %}
+          <tr><td><input type="radio" name="reward" id="rsel-btc{{ forloop.counter }}" value="{{ reward.name }}"></td><td class="price"><strong><i class="icon-btc"></i> {{ reward.min_amount|dollars_to_btc }}</strong></td><td>{{ reward.name }}</td><td>{{ reward.short_desc }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <h4 class="phead">Step 3 - Fill in your payment information</h4>
+
+    <div id="ref-grp" class="form-group">
+      <label class="control-label" for="bc-ref">Your Bitcoin address</label>
+      <input type="text" class="form-control" name="ref" id="ref" />
+      <p class="help-block">This is used to verify that transactions have successfully completed before shipping. Once the order details are confirmed, you will complete the transaction manually via your Bitcoin client of preference.</p>
+    </div>
+
+    <div id="email-grp" class="form-group">
+      <label class="control-label" for="email">Your Email</label>
+      <input type="text" class="form-control" name="email" id="email" placeholder="name@example.com" />
+    </div>
+
+    <div id="sh-form">
+      <h4 class="phead">Step 5 - Fill in your shipping details</h4>
+
+      <div id="sh-name-grp" class="form-group">
+        <label class="control-label" for="sh-name">Name</label>
+        <input type="text" id="sh-name" name="sh_name" class="form-control" />
+      </div>
+
+      <div id="sh-addr1-grp" class="form-group">
+        <label class="control-label" for="sh-addr1">Address 1</label>
+        <input type="text" class="form-control" id="sh-addr1" name="sh_addr1" x-autocompletetype="address-line1" />
+      </div>
+
+      <div id="sh-addr2-grp" class="form-group">
+        <label class="control-label" for="sh-addr2">Address 2</label>
+        <input type="text" class="form-control" id="sh-addr2" name="sh_addr2" x-autocompletetype="address-line2" />
+      </div>
+
+      <div id="sh-city-grp" class="form-group">
+        <label class="control-label" for="sh-city">City</label>
+        <input type="text" class="form-control" id="sh-city" name="sh_city" x-autocompletetype="city" />
+      </div>
+
+      <div id="sh-state-grp" class="form-group">
+        <label class="control-label" for="sh-state">State/Province</label>
+        <input type="text" class="form-control" id="sh-state" name="sh_state" x-autocompletetype="administrative-area" />
+      </div>
+
+      <div id="sh-post-grp" class="form-group">
+        <label class="control-label" for="sh-post">Postal Code</label>
+        <input type="text" class="form-control" id="sh-post" name="sh_post" x-autocompletetype="postal-code" />
+      </div>
+
+      <div id="sh-country-grp" class="form-group">
+        <label class="control-label" for="sh-country">Country</label>
+        <input type="text" class="form-control" id="sh-country" name="sh_country" x-autocompletetype="country-name" />
+      </div>
+    </div>
+
+    <div class="checkbox">
+      <label>
+        <input name="notify" type="checkbox"> Notify me by email if the project posts updates
+      </label>
+    </div>
+
+    <p class="phead">Click below to verify the information and submit your order. You will have the opportunity to confirm your order before any charge is made.</p>
+    {% csrf_token %}
+    <a class="btn btn-lg btn-default" href="/" id="backbutton"><i class="icon-arrow-left"></i> Back</a>
+    <button type="button" class="pull-right btn btn-lg btn-primary" href="#" id="submitbutton">Next <i class="icon-arrow-right"></i></button>
+  </form>
+{% endblock %}

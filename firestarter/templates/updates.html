@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block body %}
+{% load gravatar %}
+{% load markup %}
+{% load widget_tweaks %}
+{% for u in updates %}
+<div class="fs-update">
+	<div class="fs-update-byline media">
+		<a class="pull-left" href="mailto:{{ u.1.email }}">
+			<img class="media-object" src="{% gravatar_url u.1.email 50 %}" />
+		</a>
+		<div class="media-body">
+			<h3 class="media-heading pull-right text-muted"><a href="{{u.0}}"><i class="icon-link"></i></a></h3>
+			<h3 id="{{ u.1.pk }}" class="media-heading">{{ u.1.subject }}</h3>
+			<p>By <a href="mailto:{{ u.1.email }}"><strong>{{ u.1.author }}</strong></a> - {{ u.1.created_at }}</p>
+		</div>
+	</div>
+	<p>{{ u.1.text|markdown:"safe" }}</p>
+	<hr />
+	<div class="row">
+		<div class="col-md-3">
+			<a href="https://www.facebook.com/sharer/sharer.php?u={{ u.0|urlencode:''}}" target="_blank"><i class="icon-facebook-sign"></i> Post to Facebook</a>
+		</div>
+		<div class="col-md-3">
+			<a href="https://twitter.com/home?status={{u.1.subject|urlencode:''}} - {{proj_name}} - {{ u.0|urlencode:'' }}" target="_blank"><i class="icon-twitter"></i> Post to Twitter</a>
+		</div>
+		<div class="col-md-3">
+			<a href="https://plus.google.com/share?url={{u.0|urlencode:''}}" target="_blank"><i class="icon-google-plus-sign"></i> Post to Google+</a>
+		</div>
+		<div class="col-md-3">
+			<a href="http://sharetodiaspora.github.io/?title={{u.1.subject|urlencode:''}}%20%2D%20{{proj_name|urlencode:''}}&url={{u.0|urlencode:''}}" target="_blank"><i class="icon-asterisk"></i> Post to Diaspora</a>
+		</div>
+	</div>
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<head>
+	{% load staticfiles %}
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}" media="screen" />
+	<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" media="screen" />
+	<link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}" media="screen" />
+	<script type="text/javascript" src="{% static 'js/jquery-1.10.2.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/jquery.fitvids.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/fund.js' %}"></script>
+	<title>{{ proj_name }}</title>
+</head>
+<body>
+	{% load currency %}
+	<div class="container">
+		<div class="masthead">
+			<a href="{{ proj_url }}"><img src="{% static 'img/logo.png' %}" /></a>
+		</div>
+		<div class="row fs-head">
+			<div class="col-md-6 videocol">
+				<iframe src="//player.vimeo.com/video/23136511?title=0&byline=0&portrait=0"  frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+			</div>
+			<div class="col-md-6">
+				<h2 class="slimtop text-center"><strong>{{ slogan }}</strong></h2>
+				<div class="progress">
+					<div class="progress-bar" role="progressbar" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ pct }}%;">
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-3 text-center">
+						<h1 class="slimtop">{{ pct_disp }}%</h1>
+						<p class="lead">complete</p>
+					</div>
+					<div class="col-md-3 text-center">
+						<h1 class="slimtop">{{ backers }}</h1>
+						<p class="lead">backers</p>
+					</div>
+					<div class="col-md-3 text-center">
+						<h1 class="slimtop">${{ total }}</h1>
+						<p class="lead">pledged of ${{ goal }}</p>
+					</div>
+					<div class="col-md-3 text-center">
+						<h1 class="slimtop">{% if days >= 0 %}{{ days }}{% else %}0{% endif %}</h1>
+						<p class="lead">day{% if days != 1 %}s{% endif %} left</p>
+					</div>
+				</div>
+				{% if nopay %}
+				<a class="btn btn-lg btn-primary btn-block disabled" href="/c/choose"><i class="icon-ok"></i> Campaign Ended</a>
+				{% else %}
+				<a class="btn btn-lg btn-success btn-block" href="/c/choose"><i class="icon-ok"></i> Contribute Now</a>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8">
+				<ul class="nav nav-tabs">
+					<li{% if activepage == 'home' %} class="active"{% endif %}><a href="/">Home</a></li>
+					{% for page in pages %}
+					<li{% if activepage == page.0 %} class="active"{% endif %}><a href="/p/{{ page.0 }}">{{ page.1 }}</a>
+					{% endfor %}
+					<li{% if activepage == 'updates' %} class="active"{% endif %}><a href="/updates">Updates{% if unum > 0 %} <span class="badge">{{ unum }}</span>{% endif %}</a></li>
+					<li{% if activepage == 'questions' %} class="active"{% endif %}><a href="/questions">Your Questions{% if qnum > 0 %} <span class="badge">{{ qnum }}</span>{% endif %}</a></li>
+				</ul>
+				{% block body %}{% endblock %}
+			</div>
+			<div class="col-md-4">
+				<h1>Reward Levels</h1>
+				<p>{{ rewards_disclaimer }}</p>
+				<ul class="nav nav-pills nav-justified">
+					<li id="rewardamtbtnusd"><a href="#"><i class="icon-dollar"></i> USD</a></li>
+					<li id="rewardamtbtnbtc"><a href="#"><i class="icon-btc"></i> BTC</a></li>
+					<li id="rewardamtbtneur"><a href="#"><i class="icon-euro"></i> EUR</a></li>
+					<li id="rewardamtbtngbp"><a href="#"><i class="icon-gbp"></i> GBP</a></li>
+				</ul>
+				<small class="text-muted">Currency rates subject to change. Contributions are made in either USD or BTC.</small>
+				{% for r in rewards %}
+				<div class="reward">
+					<h3><i class="{{ r.icon_class }}"></i> {{ r.name }} <span class="text-muted"><span class="rewardamt rewardamtusd pull-right">${{ r.min_amount|stringformat:".0f" }}</span><span class="rewardamt rewardamtbtc pull-right"><i class="icon-btc"></i>{{ r.min_amount|dollars_to_btc }}</span><span class="rewardamt rewardamteur pull-right">€{{ r.min_amount|dollars_to_eur }}</span><span class="rewardamt rewardamtgbp pull-right">₤{{ r.min_amount|dollars_to_gbp }}</span></span></h3>
+					<p>{{ r.desc }}</p>
+					{% if r.fine_print %}
+					<small class="text-muted">{{ r.fine_print }}</small>
+					{% endif %}
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+</body>
+</html>

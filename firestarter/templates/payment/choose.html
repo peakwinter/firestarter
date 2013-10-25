@@ -1,0 +1,10 @@
+{% extends 'form-base.html' %}
+{% block body %}
+{% load staticfiles %}
+  <h3>Choose payment type:</h3>
+  <br />
+  {% for type in pay_types %}
+  <a class="btn btn-default btn-lg btn-block" href="/c/{{ type.0 }}"><i class="{{ type.2 }}"></i> {{ type.1 }}</a>
+  {% endfor %}
+  <br />
+{% endblock %}

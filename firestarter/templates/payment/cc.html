@@ -1,0 +1,124 @@
+{% extends 'form-base.html' %}
+{% block body %}
+{% load staticfiles %}
+{% load currency %}
+  <form id="payform" role="form" method="POST" action="/c/CC" novalidate>
+    <img src="{% static 'img/logo.png' %}" width="200" height="auto" /><br />
+    <div class="alert alert-danger" id="validate">
+      There was an error in processing this information. Please verify that the fields in red below are correct.
+    </div>
+
+    <h4 class="phead">Step 1 - Choose your currency:</h4>
+    <div id="ctypechoose" class="row text-center">
+      <div class="col-md-4 ctypes">
+        <input type="radio" name="currency" id="ctype-usd" value="usd"> <strong><i class="icon-dollar"></i> US Dollar</strong>
+      </div>
+      <div class="col-md-4 ctypes">
+        <input type="radio" name="currency" id="ctype-eur" value="eur"> <strong><i class="icon-euro"></i> Euro</strong>
+      </div>
+      <div class="col-md-4 ctypes">
+        <input type="radio" name="currency" id="ctype-gbp" value="gbp"> <strong><i class="icon-gbp"></i> Pound Sterling</strong>
+      </div>
+      <p class="text-muted">This is for comparison purposes only - the transaction will occur in US dollars.</p>
+    </div>
+
+    <h4 class="phead">Step 2 - Set your donation amount: </h4>
+    <div id="donate-grp" class="form-group input-group input-group-lg">
+      <span class="input-group-addon"><i id="currency-icon" class="icon-usd"></i></span>
+      <input type="text" class="form-control" name="amount" id="amount" placeholder="USD" />
+    </div>
+
+    <h4 class="phead">Step 3 - Choose your reward level:</h4>
+    <p>For more information about rewards, <a href="/">go back</a></p>
+    <div id="rewards-grp" class="form-group">
+      <table class="table table-hover">
+        <tbody id="rewardslist">
+          <tr><td><input type="radio" name="reward" id="rsel0" value="none"></td><td class="price"><strong><span class="currency-symbol"></span> 0</strong></td><td>None</td><td>Don't send me a reward</td></tr>
+          {% for reward in rewards %}
+          <tr><td><input type="radio" name="reward" id="rsel-{{ forloop.counter }}" value="{{ reward.name }}"></td><td class="price"><strong><span class="currency-symbol"></span><span class="rewardamtusd"> {{ reward.min_amount }}</span><span class="rewardamteur"> {{ reward.min_amount|dollars_to_eur }}</span><span class="rewardamtgbp"> {{ reward.min_amount|dollars_to_gbp }}</span></strong></td><td>{{ reward.name }}</td><td>{{ reward.short_desc }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <h4 class="phead">Step 4 - Fill in your payment information</h4>
+
+    <div id="cc-form">
+      <div id="cc-name-grp" class="form-group">
+        <label class="control-label" for="cc-name">Cardholder Name</label>
+        <input type="text" id="cc-name" name="cc_name" class="form-control" />
+      </div>
+
+      <div id="cc-email-grp" class="form-group">
+        <label class="control-label" for="email">Your Email</label>
+        <input type="text" class="form-control" name="email" id="email" placeholder="name@example.com" />
+      </div>
+
+      <div id="cc-num-grp" class="form-group">
+        <label class="control-label" for="cc-number">Card Number</label>
+        <input type="text" class="form-control" id="cc-number" pattern="\d*" x-autocompletetype="cc-number" />
+      </div>
+
+      <div id="cc-exp-grp" class="form-group">
+        <label class="control-label" for="cc-exp">Expiration (format MM / YY)</label>
+        <input type="text" class="form-control" id="cc-exp" pattern="\d*" x-autocompletetype="cc-exp" />
+      </div>
+
+      <div id="cc-cvc-grp" class="form-group">
+        <label class="control-label" for="cc-cvc">CVC (Security Code)</label>
+        <input type="text" class="form-control" id="cc-cvc" pattern="\d*" autocomplete="off" />
+      </div>
+    </div>
+
+    <div id="sh-form">
+      <h4 class="phead">Step 5 - Fill in your shipping details</h4>
+
+      <div id="sh-name-grp" class="form-group">
+        <label class="control-label" for="sh-name">Name</label>
+        <input type="text" id="sh-name" name="sh_name" class="form-control" />
+      </div>
+
+      <div id="sh-addr1-grp" class="form-group">
+        <label class="control-label" for="sh-addr1">Address 1</label>
+        <input type="text" class="form-control" id="sh-addr1" name="sh_addr1" x-autocompletetype="address-line1" />
+      </div>
+
+      <div id="sh-addr2-grp" class="form-group">
+        <label class="control-label" for="sh-addr2">Address 2</label>
+        <input type="text" class="form-control" id="sh-addr2" name="sh_addr2" x-autocompletetype="address-line2" />
+      </div>
+
+      <div id="sh-city-grp" class="form-group">
+        <label class="control-label" for="sh-city">City</label>
+        <input type="text" class="form-control" id="sh-city" name="sh_city" x-autocompletetype="city" />
+      </div>
+
+      <div id="sh-state-grp" class="form-group">
+        <label class="control-label" for="sh-state">State/Province</label>
+        <input type="text" class="form-control" id="sh-state" name="sh_state" x-autocompletetype="administrative-area" />
+      </div>
+
+      <div id="sh-post-grp" class="form-group">
+        <label class="control-label" for="sh-post">Postal Code</label>
+        <input type="text" class="form-control" id="sh-post" name="sh_post" x-autocompletetype="postal-code" />
+      </div>
+
+      <div id="sh-country-grp" class="form-group">
+        <label class="control-label" for="sh-country">Country</label>
+        <input type="text" class="form-control" id="sh-country" name="sh_country" x-autocompletetype="country-name" />
+      </div>
+    </div>
+
+    <div class="checkbox">
+      <label>
+        <input name="notify" type="checkbox"> Notify me by email if the project posts updates
+      </label>
+    </div>
+
+    <p class="phead">Click below to verify the information and submit your order. You will have the opportunity to confirm your order before any charge is made. Payments are securely processed by <a href="https://www.stripe.com">Stripe</a>.</p>
+    {% csrf_token %}
+    <a class="btn btn-lg btn-default" href="/" id="backbutton"><i class="icon-arrow-left"></i> Back</a>
+    <button type="button" class="pull-right btn btn-lg btn-primary" href="#" id="submitbutton">Next <i class="icon-arrow-right"></i></button>
+  </form>
+  <script type="text/javascript">Stripe.setPublishableKey('{{ stripe_public_key }}');</script>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'form-base.html' %}
+{% block body %}
+{% load staticfiles %}
+{% load currency %}
+  <form id="payform" role="form" method="POST" action="/c/PP" novalidate>
+    <img src="{% static 'img/logo.png' %}" width="200" height="auto" /><br />
+    <div class="alert alert-danger" id="validate">
+      There was an error in processing this information. Please verify that the fields in red below are correct.
+    </div>
+
+    <h4 class="phead">Step 1 - Choose your currency:</h4>
+    <div id="ctypechoose" class="row text-center">
+      <div class="col-md-4 ctypes">
+        <input type="radio" name="currency" id="ctype-usd" value="usd"> <strong><i class="icon-dollar"></i> US Dollar</strong>
+      </div>
+      <div class="col-md-4 ctypes">
+        <input type="radio" name="currency" id="ctype-eur" value="eur"> <strong><i class="icon-euro"></i> Euro</strong>
+      </div>
+      <div class="col-md-4 ctypes">
+        <input type="radio" name="currency" id="ctype-gbp" value="gbp"> <strong><i class="icon-gbp"></i> Pound Sterling</strong>
+      </div>
+      <p class="text-muted">This is for comparison purposes only - the transaction will occur in US dollars.</p>
+    </div>
+
+    <h4 class="phead">Step 2 - Set your donation amount: </h4>
+    <div id="donate-grp" class="form-group input-group input-group-lg">
+      <span class="input-group-addon"><i id="currency-icon" class="icon-usd"></i></span>
+      <input type="text" class="form-control" name="amount" id="amount" placeholder="USD" />
+    </div>
+
+    <h4 class="phead">Step 3 - Choose your reward level:</h4>
+    <p>For more information about rewards, <a href="/">go back</a></p>
+    <div id="rewards-grp" class="form-group">
+      <table class="table table-hover">
+        <tbody id="rewardslist">
+          <tr><td><input type="radio" name="reward" id="rsel0" value="none"></td><td class="price"><strong><span class="currency-symbol"></span> 0</strong></td><td>None</td><td>Don't send me a reward</td></tr>
+          {% for reward in rewards %}
+          <tr><td><input type="radio" name="reward" id="rsel-{{ forloop.counter }}" value="{{ reward.name }}"></td><td class="price"><strong><span class="currency-symbol"></span><span class="rewardamtusd"> {{ reward.min_amount }}</span><span class="rewardamteur"> {{ reward.min_amount|dollars_to_eur }}</span><span class="rewardamtgbp"> {{ reward.min_amount|dollars_to_gbp }}</span></strong></td><td>{{ reward.name }}</td><td>{{ reward.short_desc }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div id="cc-email-grp" class="form-group">
+      <label class="control-label" for="email">Your Email</label>
+      <input type="text" class="form-control" name="email" id="email" placeholder="name@example.com" />
+    </div>
+
+    <div class="checkbox">
+      <label>
+        <input name="notify" type="checkbox"> Notify me by email if the project posts updates
+      </label>
+    </div>
+
+    <p class="phead">Click below to verify the information and proceed to PayPal to provide credentials. You will have the opportunity to confirm your order before any charge is made.</p>
+    {% csrf_token %}
+    <a class="btn btn-lg btn-default" href="/" id="backbutton"><i class="icon-arrow-left"></i> Back</a>
+    <button type="button" class="pull-right btn btn-lg btn-primary" href="#" id="submitbutton">Next <i class="icon-arrow-right"></i></button>
+  </form>
+{% endblock %}

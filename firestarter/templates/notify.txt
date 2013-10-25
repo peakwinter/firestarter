@@ -1,0 +1,12 @@
+Thank you for your contribution to {{ proj_name }}!
+
+
+Date/time: {{ time }}
+Payment type: {%if order.ptype == 'bc'%}Bitcoin{%else%}{{order.cc_type}} x-{{order.cc_last4}}{%endif%}
+Contribution amount: {%if order.ptype == 'bc'%}BTC {{order.amount_btc}}{%else%}${{order.amount}}{%endif%}
+Reward claimed: {{ order.reward_name }}
+Reward description: {{ reward_desc }}
+
+--
+
+For information about the project or the rewards offered, please visit {{ proj_addr }}.
