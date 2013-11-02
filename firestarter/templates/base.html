@@ -67,6 +67,12 @@
 				{% block body %}{% endblock %}
 			</div>
 			<div class="col-md-4">
+				<div class="btn-group btn-group-lg btn-group-justified">
+					<a class="btn btn-lg btn-primary" rel="tooltip" data-toggle="tooltip" title="Share to Facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ proj_addr|urlencode:'' }}" target="_blank"><i class="icon-facebook-sign text-center"></i></a>
+					<a class="btn btn-lg btn-info" rel="tooltip" data-toggle="tooltip" title="Tweet this page" href="https://twitter.com/home?status=Check%20this%20out!%20{{ proj_name|urlencode:'' }}%20-%20{{ proj_addr|urlencode:'' }}" target="_blank"><i class="icon-twitter text-center"></i></a>
+					<a class="btn btn-lg btn-danger" rel="tooltip" data-toggle="tooltip" title="Share to Google+" href="https://plus.google.com/share?url={{ proj_addr|urlencode:'' }}" target="_blank"><i class="icon-google-plus-sign text-center"></i></a>
+					<a class="btn btn-lg btn-default" rel="tooltip" data-toggle="tooltip" title="Share to Diaspora" href="http://sharetodiaspora.github.io/?title=Check%20this%20out!%20{{ proj_name|urlencode:'' }}&url={{ proj_addr|urlencode:'' }}" target="_blank"><i class="icon-asterisk text-center"></i></a>
+				</div>
 				<h1>Reward Levels</h1>
 				<p>{{ rewards_disclaimer }}</p>
 				<ul class="nav nav-pills nav-justified">
@@ -80,6 +86,9 @@
 				<div class="reward">
 					<h3><i class="{{ r.icon_class }}"></i> {{ r.name }} <span class="text-muted"><span class="rewardamt rewardamtusd pull-right">${{ r.min_amount|stringformat:".0f" }}</span><span class="rewardamt rewardamtbtc pull-right"><i class="icon-btc"></i>{{ r.min_amount|dollars_to_btc }}</span><span class="rewardamt rewardamteur pull-right">€{{ r.min_amount|dollars_to_eur }}</span><span class="rewardamt rewardamtgbp pull-right">₤{{ r.min_amount|dollars_to_gbp }}</span></span></h3>
 					<p>{{ r.desc }}</p>
+					{% if r.img %}
+					<a href="{{ r.img }}" target="_blank"><img src="{{ r.img }}" class="img-responsive img-thumbnail" /></a>
+					{% endif %}
 					{% if r.fine_print %}
 					<small class="text-muted">{{ r.fine_print }}</small>
 					{% endif %}
@@ -88,5 +97,10 @@
 			</div>
 		</div>
 	</div>
+	<script type="text/javascript">
+		$(function () {
+			$("[rel='tooltip']").tooltip({container: 'body'});
+		});
+	</script>
 </body>
 </html>

@@ -14,6 +14,7 @@ from firestarter.currency import dollars_to_eur, dollars_to_gbp, eur_to_dollars,
 
 
 def approve_payment(request):
+	proj_name = settings.PROJECT_NAME
 	if request.method == 'POST':
 		fd = request.POST.copy()
 		fd['ptype'] = 'PP'
@@ -82,6 +83,12 @@ def approve_payment(request):
 		return render(request, 'payment/pp.html', locals())
 
 def handle_response(request):
+	proj_name = settings.PROJECT_NAME
+	paypalrestsdk.configure({
+		'mode': settings.PAYPAL_MODE,
+		'client_id': settings.PAYPAL_CLIENT_ID,
+		'client_secret': settings.PAYPAL_CLIENT_SECRET
+	})
 	if request.method == 'GET':
 		data = paypalrestsdk.Payment.find(request.session['paypal_id'])
 		request.session['paypal_pid'] = request.GET['PayerID']
@@ -99,6 +106,11 @@ def handle_response(request):
 		return render(request, 'error.html', locals())
 
 def complete_payment(request):
+	paypalrestsdk.configure({
+		'mode': settings.PAYPAL_MODE,
+		'client_id': settings.PAYPAL_CLIENT_ID,
+		'client_secret': settings.PAYPAL_CLIENT_SECRET
+	})
 	if request.session['fd'] and request.session['paypal_id']:
 		time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
 		reward_desc = (Reward.objects.get(name=request.session['fd']['reward_name']).desc if request.session['fd']['reward'] else 'None')
@@ -106,7 +118,7 @@ def complete_payment(request):
 		if pmt['state'] == 'created':
 			if pmt.execute({"payer_id": request.session['paypal_pid']}):
 				o = Order(
-					name='PayPal User',
+					name=(request.session['fd']['namecredit'] if request.session['fd']['namecredit'] else 'PayPal User'),
 					addr1='',
 					addr2='',
 					city='',
@@ -118,6 +130,8 @@ def complete_payment(request):
 					ptype='PP',
 					pref=request.session['paypal_id'],
 					email=request.session['fd']['email'],
+					namecredit=request.session['fd']['namecredit'],
+					notes=request.session['fd']['notes']
 				)
 				request.session['paypal_id'] = {}
 				request.session['paypal_pid'] = {}
@@ -126,14 +140,14 @@ def complete_payment(request):
 				except:
 					pass
 				o.save()
-				send_mail(
-					subject=settings.PROJECT_NAME+' - Thank you for your contribution',
-					message=get_template('notify.txt').render(Context({'order': request.session['fd'], 'proj_name': settings.PROJECT_NAME, 'proj_addr': settings.PROJECT_ADDR, 'time': time, 'reward_desc': reward_desc})),
-					from_email=settings.NOTIFY_SENDER, 
-					recipient_list=[request.session['fd']['email']],
-					fail_silently=True)
+				if request.session['fd']['email']:
+					send_mail(
+						subject=settings.PROJECT_NAME+' - Thank you for your contribution',
+						message=get_template('notify.txt').render(Context({'order': request.session['fd'], 'proj_name': settings.PROJECT_NAME, 'proj_addr': settings.PROJECT_ADDR, 'time': time, 'reward_desc': reward_desc})),
+						from_email=settings.NOTIFY_SENDER, 
+						recipient_list=[request.session['fd']['email']],
+						fail_silently=True)
 				request.session['fd'] = {}
-				success_disclaimer = settings.SUCCESS_DISCLAIMER
 				return render(request, 'payment/success.html', locals())
 			else:
 				request.session['paypal_id'] = {}

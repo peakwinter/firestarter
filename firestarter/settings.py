@@ -1,4 +1,5 @@
 import datetime
+import os
 
 #
 # Firestarter Project Settings
@@ -71,6 +72,8 @@ REWARDS_DISCLAIMER = 'All contributions of $2 or more get the donor\'s name (or 
 #####################################################################
 
 # Django settings for firestarter project.
+
+PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG

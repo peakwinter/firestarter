@@ -17,8 +17,8 @@ $(document).ready(function() {
 var updatePrice = function(row) {
 	if (paymentType == 'bc' && (parseFloat($('#amount').val()) < parseFloat($(row).children('.price').text().split(' ')[1]) || !($('#amount').val()))) {
 		$('#amount').val(parseFloat($(row).children('.price').text().split(' ')[1]));
-	} else if (paymentType != 'bc' && (parseInt($('#amount').val()) < parseFloat($(row).children('.price').text().split(' ')[1]) || !($('#amount').val()))) {
-		$('#amount').val(parseFloat($(row).find('.rewardamt'+currencyType).text().split(' ')[1]));
+	} else if (paymentType != 'bc' && (!($('#amount').val()) || parseFloat($('#amount').val()) < parseFloat($(row).find('.rewardamt'+currencyType).text().split(' ')[1]))) {
+		$('#amount').val(parseFloat($(row).find('.rewardamt'+currencyType).text().split(' ')[1]).toFixed(2));
 	};
 };
 

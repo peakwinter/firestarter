@@ -18,7 +18,7 @@ urlpatterns = patterns('firestarter.views',
     url(r'^admin/', include(admin.site.urls))
 )
 
-for x in os.listdir('firestarter/templates/pages'):
+for x in os.listdir(os.path.join(settings.PROJECT_PATH, '/templates/pages')):
     urlpatterns += patterns('firestarter.views',
         url(r'^p/'+x[:-5]+'$', 'page', {'pagename': x[:-5]})
     )

@@ -19,8 +19,8 @@ from firestarter.models import Order, Reward, Update, Question
 from firestarter.forms import QuestionForm
 
 PAGES = []
-for x in os.listdir('firestarter/templates/pages'):
-    PAGES.append((x[:-5], x[:-5].capitalize()))
+for x in os.listdir(os.path.join(settings.PROJECT_PATH, '/templates/pages')):
+	PAGES.append((x[:-5], x[:-5].capitalize()))
 
 def intWithCommas(x):
 	if x < 0:
@@ -31,86 +31,60 @@ def intWithCommas(x):
 		result = ",%03d%s" % (r, result)
 	return "%d%s" % (x, result)
 
-def get_numbers():
-	goal = intWithCommas(settings.GOAL)
+def get_context():
 	total = Order.objects.all().aggregate(Sum('amount'))['amount__sum']
-	backers = Order.objects.count()
-	if total:
-		pct = 100 * float(total) / float(settings.GOAL)
-		pct_disp = int(pct)
-		total = intWithCommas(int(total))
-	else:
-		pct = 0
-		pct_disp = 0
-		total = '0'
-	days = (settings.DATE - datetime.datetime.now()).days
-	return goal, total, backers, pct, pct_disp, days
-
-def get_rewards():
-	rewards = Reward.objects.all()
-	rewards_disclaimer = settings.REWARDS_DISCLAIMER
-	return rewards, rewards_disclaimer
+	pct = ((100 * float(total) / float(settings.GOAL)) if total else 0)
+	c = Context({
+		'activepage': 'home',
+		'goal': intWithCommas(settings.GOAL),
+		'backers': Order.objects.count(),
+		'pct': pct,
+		'pct_disp': (int(pct) if total else 0),
+		'total': (intWithCommas(int(total)) if total else '0'),
+		'pages': PAGES,
+		'nopay': (True if settings.STOP and (settings.DATE - datetime.datetime.now()).days < 0 else False),
+		'days': (settings.DATE - datetime.datetime.now()).days,
+		'rewards': sorted(Reward.objects.all(), key=lambda i: i.min_amount),
+		'rewards_disclaimer': settings.REWARDS_DISCLAIMER,
+		'unum': Update.objects.all().count(),
+		'qnum': Question.objects.all().count(),
+		'proj_name': settings.PROJECT_NAME,
+		'proj_addr': settings.PROJECT_ADDR
+		})
+	return c
 
 def home(request):
-	pages = PAGES
-	proj_name = settings.PROJECT_NAME
-	proj_addr = settings.PROJECT_ADDR
-	slogan = settings.PROJECT_SLOGAN
-	if settings.STOP and (settings.DATE - datetime.datetime.now()).days < 0:
-		nopay = True
-	goal, total, backers, pct, pct_disp, days = get_numbers()
-	rewards, rewards_disclaimer = get_rewards()
-	activepage = 'home'
-	unum = Update.objects.all().count()
-	qnum = Question.objects.all().count()
-	return render(request, 'home.html', locals())
+	return render(request, 'home.html', get_context())
 
 def questions(request):
-	pages = PAGES
-	proj_name = settings.PROJECT_NAME
-	proj_addr = settings.PROJECT_ADDR
-	slogan = settings.PROJECT_SLOGAN
-	if settings.STOP and (settings.DATE - datetime.datetime.now()).days < 0:
-		nopay = True
-	goal, total, backers, pct, pct_disp, days = get_numbers()
-	rewards, rewards_disclaimer = get_rewards()
-	unum = Update.objects.all().count()
-	qnum = Question.objects.all().count()
-	activepage = 'questions'
-	questions = Question.objects.filter(orig=None).order_by('created_at').reverse()
+	c = get_context()
+	c['activepage'] = 'questions'
+	c['questions'] = Question.objects.filter(orig=None).order_by('created_at').reverse()
 	if request.method == 'POST':
-		form = QuestionForm(request.POST)
-		if form.is_valid():
-			f = form.save(commit=False)
+		c['form'] = QuestionForm(request.POST)
+		if c['form'].is_valid():
+			f = c['form'].save(commit=False)
 			if not f.email and f.notify:
 				messages.error(request, "Please provide an email address to receive a notification.")
-				return render(request, 'comments.html', locals())
+				return render(request, 'comments.html', c)
 			else:
 				f.save()
 		else:
 			messages.error(request, "An error occurred in validation. Please make sure all fields are complete and correct.")
 	else:
-		form = QuestionForm()
-	return render(request, 'comments.html', locals())
+		c['form'] = QuestionForm()
+	return render(request, 'comments.html', c)
 
 def updates(request):
-	pages = PAGES
-	proj_name = settings.PROJECT_NAME
-	proj_addr = settings.PROJECT_ADDR
-	slogan = settings.PROJECT_SLOGAN
-	if settings.STOP and (settings.DATE - datetime.datetime.now()).days < 0:
-		nopay = True
-	goal, total, backers, pct, pct_disp, days = get_numbers()
-	rewards, rewards_disclaimer = get_rewards()
-	unum = Update.objects.all().count()
-	qnum = Question.objects.all().count()
-	activepage = 'updates'
-	updates = []
+	c = get_context()
+	c['activepage'] = 'updates'
+	c['updates'] = []
 	for u in Update.objects.all().order_by('created_at').reverse():
-		updates.append((settings.PROJECT_ADDR+'/updates/#'+str(u.pk), u))
-	return render(request, 'updates.html', locals())
+		c['updates'].append((settings.PROJECT_ADDR+'/updates/#'+str(u.pk), u))
+	return render(request, 'updates.html', c)
 
 def choose(request):
+	proj_name = settings.PROJECT_NAME
 	pay_types = settings.PAY_TYPES
 	if settings.STOP and (settings.DATE - datetime.datetime.now()).days < 0:
 		msg = 'The funding campaign is complete and is no longer accepting new contributions.'
@@ -119,18 +93,9 @@ def choose(request):
 		return render(request, 'payment/choose.html', locals())
 
 def page(request, pagename=''):
-	pages = PAGES
-	proj_name = settings.PROJECT_NAME
-	proj_addr = settings.PROJECT_ADDR
-	slogan = settings.PROJECT_SLOGAN
-	if settings.STOP and (settings.DATE - datetime.datetime.now()).days < 0:
-		nopay = True
-	goal, total, backers, pct, pct_disp, days = get_numbers()
-	rewards, rewards_disclaimer = get_rewards()
-	unum = Update.objects.all().count()
-	qnum = Question.objects.all().count()
-	activepage = pagename
-	return render(request, 'pages/'+pagename+'.html', locals())
+	c = get_context()
+	c['activepage'] = pagename
+	return render(request, 'pages/'+pagename+'.html', c)
 
 @receiver(post_save, sender=Update)
 def send_notif(sender, instance, **kwargs):
@@ -139,7 +104,7 @@ def send_notif(sender, instance, **kwargs):
 	for order in Order.objects.all():
 		if order.notify:
 			send_mail(subject=proj_name+' - New Update', 
-				message=get_template('update.txt').render(Context({'update': sender, 'proj_name': proj_name, 'proj_addr': proj_addr})), 
+				message=get_template('update.txt').render(Context({'update': instance, 'proj_name': proj_name, 'proj_addr': proj_addr})), 
 				from_email=settings.NOTIFY_SENDER, 
 				recipient_list=[order.email],
 				fail_silently=True)

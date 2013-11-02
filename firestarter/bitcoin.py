@@ -42,7 +42,7 @@ def complete_payment(request):
 		reward_desc = (Reward.objects.get(name=request.session['fd']['reward_name']).desc if request.session['fd']['reward'] else 'None')
 		btc = True
 		o = Order(
-			name=(request.session['fd']['sh_name'] if request.session['fd']['sh_name'] else 'Bitcoin User'),
+			name=(request.session['fd']['namecredit'] if request.session['fd']['namecredit'] else (request.session['fd']['sh_name'] if request.session['fd']['sh_name'] else 'Bitcoin User')),
 			addr1=request.session['fd']['sh_addr1'],
 			addr2=request.session['fd']['sh_addr2'],
 			city=request.session['fd']['sh_city'],
@@ -51,23 +51,25 @@ def complete_payment(request):
 			country=request.session['fd']['sh_country'],
 			reward=(Reward.objects.get(name=request.session['fd']['reward_name']) if request.session['fd']['reward'] else None),
 			amount=decimal.Decimal(float(get_btc_rate()) * float(request.session['fd']['amount'])),
-			ptype=request.session['fd']['ptype'].upper(),
+			ptype='BC',
 			pref=request.session['fd']['ref'],
 			email=request.session['fd']['email'],
+			namecredit=request.session['fd']['namecredit'],
+			notes=request.session['fd']['notes']
 		)
 		try:
 			o.notify = request.session['fd']['notify']
 		except:
 			pass
 		o.save()
-		send_mail(
-			subject='Thank you for your contribution',
-			message=get_template('notify.txt').render(Context({'order': request.session['fd'], 'proj_name': proj_name, 'proj_addr': proj_addr, 'time': time, 'reward_desc': reward_desc})),
-			from_email=settings.NOTIFY_SENDER, 
-			recipient_list=[request.session['fd']['email']],
-			fail_silently=False)
+		if request.session['fd']['email']:
+			send_mail(
+				subject='Thank you for your contribution',
+				message=get_template('notify.txt').render(Context({'order': request.session['fd'], 'proj_name': proj_name, 'proj_addr': proj_addr, 'time': time, 'reward_desc': reward_desc})),
+				from_email=settings.NOTIFY_SENDER, 
+				recipient_list=[request.session['fd']['email']],
+				fail_silently=False)
 		request.session['fd'] = {}
-		success_disclaimer = settings.SUCCESS_DISCLAIMER
 		return render(request, 'payment/success.html', locals())
 	else:
 		msg = 'Your session data could not be found. Please retry your submission again.'

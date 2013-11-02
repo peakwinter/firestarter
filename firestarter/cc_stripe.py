@@ -68,6 +68,8 @@ def complete_payment(request):
 				ptype='CC',
 				pref=request.session['fd']['cc_type'] + ' x-'+ request.session['fd']['cc_last4'],
 				email=request.session['fd']['email'],
+				namecredit=request.session['fd']['namecredit'],
+				notes=request.session['fd']['notes']
 			)
 		except:
 			msg = "There was a problem saving your order details to the database. Your card has NOT been charged. Please notify the site operator."
@@ -92,7 +94,6 @@ def complete_payment(request):
 				recipient_list=[request.session['fd']['email']],
 				fail_silently=False)
 			request.session['fd'] = {}
-			success_disclaimer = settings.SUCCESS_DISCLAIMER
 			return render(request, 'payment/success.html', locals())
 		except stripe.CardError, e:
 			msg = "Your card has been declined. Please choose a new card or a new payment method and restart your order."

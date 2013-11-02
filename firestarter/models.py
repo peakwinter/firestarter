@@ -53,6 +53,8 @@ class Order(models.Model):
 	pref = models.CharField(max_length=255, default="", verbose_name='Payment Reference', blank=True)
 	email = models.EmailField(verbose_name='Email')
 	notify = models.BooleanField(verbose_name="Notify me if the project team posts an update?")
+	namecredit = models.CharField(max_length=255, default="", verbose_name='Credit Name', blank=True)
+	notes = models.CharField(max_length=255, default="", verbose_name='Notes', blank=True)
 
 
 class Value(models.Model):

@@ -38,11 +38,12 @@ def get_btc_rate():
 	if not Value.objects.filter(type='BTC'):
 		Value.objects.create(type='BTC', value=json.loads(urllib2.urlopen('https://api.bitcoinaverage.com/ticker/USD').read())['24h_avg'], update=True)
 		return Value.objects.filter(type='BTC')[0].value
-	elif ((current_time - Value.objects.filter(type='BTC')[0].created_at).seconds >= 900) and Value.objects.filter(type='BTC')[0].update:
+	elif ((current_time - Value.objects.filter(type='BTC')[0].created_at).days >= 1) and Value.objects.filter(type='BTC')[0].update:
 		try:
 			data = json.loads(urllib2.urlopen('https://api.bitcoinaverage.com/ticker/USD').read())
 			v = Value.objects.filter(type='BTC')[0]
 			v.value = data['24h_avg']
+			v.created_at = current_time
 			v.save()
 		except:
 			pass
@@ -63,12 +64,13 @@ def get_rate(src='', tgt=''):
 		except Exception, e:
 			raise Exception('An error occurred with Currency API check: '+str(e))
 		return Value.objects.filter(type=src+'-'+tgt)[0].value
-	elif ((current_time - Value.objects.filter(type=src+'-'+tgt)[0].created_at).seconds >= 86400) and Value.objects.filter(type=src+'-'+tgt)[0].update:
+	elif ((current_time - Value.objects.filter(type=src+'-'+tgt)[0].created_at).days >= 1) and Value.objects.filter(type=src+'-'+tgt)[0].update:
 		try:
 			data = json.loads(urllib2.urlopen('http://currency-api.appspot.com/api/'+src+'/'+tgt+'.json?key='+key).read())
 			if data['success']:
 				v = Value.objects.filter(type=src+'-'+tgt)[0]
 				v.value = data['rate']
+				v.created_at = current_time
 				v.save()
 		except:
 			pass
